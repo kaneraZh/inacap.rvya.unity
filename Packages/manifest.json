@@ -1,6 +1,6 @@
 {
   "dependencies": {
-    "com.google.xr.cardboard": "file:C:/Users/alumnosnunoa/Downloads/cardboard-xr-plugin-master",
+    "com.google.xr.cardboard": "file:C:/cardboard-xr-plugin-1.22.0",
     "com.unity.collab-proxy": "2.2.0",
     "com.unity.ide.rider": "3.0.24",
     "com.unity.ide.visualstudio": "2.0.18",
