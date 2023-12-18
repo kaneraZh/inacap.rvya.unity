@@ -1,5 +1,3 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -24,12 +22,14 @@ public class NewBehaviourScript : MonoBehaviour
             "deco size = {2}\n" +
             "deco time = {3}\n" +
             "deco list = {4}\n" +
+            "trans time = {5}\n" +
             "",
             transform.position,
-            transform.rotation,
+            transform.rotation.eulerAngles,
             interaction.decorations.Count,
-            interaction.timer_time,
-            interaction.decorations);
+            interaction.equip_timer_time,
+            interaction.decorations,
+            interaction.transition_timer_time);
 
     }
 }
