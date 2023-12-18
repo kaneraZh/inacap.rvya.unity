@@ -1,10 +1,13 @@
 using System.Collections.Generic;
-using Unity.VisualScripting;
 using UnityEngine;
 
 public class CameraInteractSight : MonoBehaviour
 {
     public LayerMask ray_mask;
+    public GameObject head;
+    public GameObject mirror;
+    public Transform courtainLeft;
+    public Transform courtainRight;
     void Start()
     {
 
@@ -20,10 +23,14 @@ public class CameraInteractSight : MonoBehaviour
     {
         public Mesh mesh;
         public Material material;
-        public Deco(Mesh mesh, Material material)
+        public Vector3 scale;
+        public Quaternion rotation;
+        public Deco(Mesh mesh, Material material, Vector3 scale, Quaternion rotation)
         {
             this.mesh = mesh;
             this.material = material;
+            this.scale = scale;
+            this.rotation = rotation;
         }
     }
     public Dictionary<string, Deco> decorations = new Dictionary<string, Deco>();
@@ -33,6 +40,17 @@ public class CameraInteractSight : MonoBehaviour
     public Vector3 mirror_normal = new Vector3 (0,0,-1);
     void Update()
     {
+        if (mirror.activeSelf)
+        {
+            courtainLeft.position = new Vector3(Mathf.Lerp(courtainLeft.position.x, -5.0f, 0.03f), courtainLeft.position.y, courtainLeft.position.z);
+            courtainRight.position= new Vector3(Mathf.Lerp(courtainRight.position.x, 5.0f, 0.03f), courtainRight.position.y,courtainRight.position.z);
+        }
+        else
+        {
+            courtainLeft.position = new Vector3(Mathf.Lerp(courtainLeft.position.x, -2.5f, 0.03f), courtainLeft.position.y, courtainLeft.position.z);
+            courtainRight.position= new Vector3(Mathf.Lerp(courtainRight.position.x, 2.5f, 0.03f), courtainRight.position.y,courtainRight.position.z);
+        }
+
         stand.rotation = Quaternion.LookRotation(
             Vector3.Reflect(transform.rotation * Vector3.forward, mirror_normal), 
             Vector3.Reflect(transform.rotation * Vector3.up     , mirror_normal)
@@ -46,6 +64,12 @@ public class CameraInteractSight : MonoBehaviour
             {
                 if(props != null)
                 {
+                    mirror.SetActive(true);
+                    
+                    head.transform.SetParent(stand, false);
+                    GameObject head_itm = Instantiate(head, stand);
+                    head_itm.transform.localScale = Vector3.one*0.48f;
+                    
                     List<string> keys = new List<string>(decorations.Keys);
                     for ( int i = 0; i < decorations.Count; i++)
                     {
@@ -57,10 +81,12 @@ public class CameraInteractSight : MonoBehaviour
                         decoration.GetComponent<MeshFilter>().mesh = meshes.mesh;
                         decoration.AddComponent<MeshRenderer>();
                         decoration.GetComponent<MeshRenderer>().material = meshes.material;
+                        decoration.GetComponent<Transform>().localScale = meshes.scale;
+                        decoration.GetComponent<Transform>().rotation = meshes.rotation;
                         decoration.transform.SetParent(stand, false);
-                        Instantiate(decoration, stand);
                     }
                     Destroy(props);
+                    transition_timer_time = 0.0f;
                 }
             }
         }
@@ -87,9 +113,10 @@ public class CameraInteractSight : MonoBehaviour
                 //hit.collider.; // <-- GameObject
                 MeshFilter mesh_filter = hit.collider.GetComponent<MeshFilter>();
                 MeshRenderer mesh_renderer = hit.collider.GetComponent<MeshRenderer>();
+                Transform hit_transform = hit.transform;
                 if(mesh_filter != null)
                 {
-                    decorations[mesh_filter.tag] = new Deco(mesh_filter.mesh, mesh_renderer.material);
+                    decorations[mesh_filter.tag] = new Deco(mesh_filter.mesh, mesh_renderer.material, hit_transform.lossyScale, hit_transform.localRotation);
                 }
             }
         }
